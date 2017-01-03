@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 1997-2014 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2016 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -43,7 +43,6 @@ package com.sun.tools.xjc.generator.bean;
 import static com.sun.tools.xjc.outline.Aspect.EXPOSED;
 
 import java.io.Serializable;
-import java.net.URL;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -124,6 +123,9 @@ import com.sun.tools.xjc.model.CReferencePropertyInfo;
  */
 public final class BeanGenerator implements Outline {
 
+    /** JAXB module name. JAXB dependency is mandatory in generated Java module. */
+    private static final String JAXB_PACKAGE = "java.xml.bind";
+
     /** Simplifies class/interface creation and collision detection. */
     private final CodeModelClassFactory codeModelClassFactory;
     private final ErrorReceiver errorReceiver;
@@ -152,7 +154,7 @@ public final class BeanGenerator implements Outline {
     /**
      * Generates beans into code model according to the BGM,
      * and produces the reflection model.
-     * 
+     *
      * @param _errorReceiver
      *      This object will receive all the errors discovered
      *      during the back-end stage.
@@ -244,7 +246,7 @@ public final class BeanGenerator implements Outline {
                             JExpr.lit(model.serialVersionUID));
                 }
             }
-            
+
             CClassInfoParent base = cc.target.parent();
             if ((base != null) && (base instanceof CClassInfo)) {
                 String pkg = base.getOwnerPackage().name();
@@ -253,7 +255,7 @@ public final class BeanGenerator implements Outline {
                     getErrorReceiver().error(cc.target.getLocator(), Messages.ERR_KEYNAME_COLLISION.format(shortName));
                 }
             }
-            
+
         }
 
         // fill in implementation classes
@@ -268,6 +270,10 @@ public final class BeanGenerator implements Outline {
         // create factories for the impl-less elements
         for (CElementInfo ei : model.getAllElements()) {
             getPackageContext(ei._package()).objectFactoryGenerator().populate(ei);
+        }
+
+        if (model.options.getModuleName() != null) {
+            codeModel._prepareModuleInfo(model.options.getModuleName(), JAXB_PACKAGE);
         }
 
         if (model.options.debugMode) {
@@ -501,7 +507,7 @@ public final class BeanGenerator implements Outline {
 
     /**
      * Generates the body of a class.
-     * 
+     *
      */
     private void generateClassBody(ClassOutlineImpl cc) {
         CClassInfo target = cc.target;
@@ -627,7 +633,7 @@ public final class BeanGenerator implements Outline {
         return new EnumOutline(e, type) {
 
             @Override
-            public 
+            public
             @NotNull
             Outline parent() {
                 return BeanGenerator.this;
@@ -763,7 +769,7 @@ public final class BeanGenerator implements Outline {
     /**
      * Determines the FieldRenderer used for the given FieldUse,
      * then generates the field declaration and accessor methods.
-     * 
+     *
      * The <code>fields</code> map will be updated with the newly
      * created FieldRenderer.
      */
@@ -824,26 +830,14 @@ public final class BeanGenerator implements Outline {
     }
 
     public JClass generateStaticClass(Class src, JPackage out) {
-        String shortName = getShortName(src.getName());
-
-        // some people didn't like our jars to contain files with .java extension,
-        // so when we build jars, we'' use ".java_". But when we run from the workspace,
-        // we want the original source code to be used, so we check both here.
-        // see bug 6211503.
-        URL res = src.getResource(shortName + ".java");
-        if (res == null) {
-            res = src.getResource(shortName + ".java_");
-        }
-        if (res == null) {
-            throw new InternalError("Unable to load source code of " + src.getName() + " as a resource");
-        }
-
-        JStaticJavaFile sjf = new JStaticJavaFile(out, shortName, res, null);
+        JStaticJavaFile sjf = new JStaticJavaFile(out, getShortName(src), src, null);
         out.addResourceFile(sjf);
         return sjf.getJClass();
     }
 
-    private String getShortName(String name) {
+    private String getShortName(Class src) {
+        String name = src.getName();
         return name.substring(name.lastIndexOf('.') + 1);
     }
+
 }

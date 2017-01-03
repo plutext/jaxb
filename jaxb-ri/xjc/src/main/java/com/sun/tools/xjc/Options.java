@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 1997-2014 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2016 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -37,7 +37,6 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
 package com.sun.tools.xjc;
 
 import java.io.BufferedReader;
@@ -160,8 +159,8 @@ public class Options
 
     /**
      * this switch determines how carefully the compiler will follow
-     * the compatibility rules in the spec. Either <code>STRICT</code>
-     * or <code>EXTENSION</code>.
+     * the compatibility rules in the spec. Either {@code STRICT}
+     * or {@code EXTENSION}.
      */
     public int compatibilityMode = STRICT;
 
@@ -202,7 +201,7 @@ public class Options
     public EntityResolver entityResolver = null;
 
     /**
-     * Type of input schema language. One of the <code>SCHEMA_XXX</code>
+     * Type of input schema language. One of the {@code SCHEMA_XXX}
      * constants.
      */
     private Language schemaLanguage = null;
@@ -277,6 +276,11 @@ public class Options
      * Used to detect if two {@link Plugin}s try to overwrite {@link #nameConverter}.
      */
     private Plugin nameConverterOwner = null;
+
+    /**
+     * Java module name in {@code module-info.java}.
+     */
+    private String javaModule = null;
 
     /**
      * Gets the active {@link FieldRendererFactory} that shall be used to build {@link Model}.
@@ -429,7 +433,7 @@ public class Options
         }
     }
 
-    
+
     private InputSource absolutize(InputSource is) {
         // absolutize all the system IDs in the input, so that we can map system IDs to DOM trees.
         try {
@@ -479,9 +483,16 @@ public class Options
                 classpaths.toArray(new URL[classpaths.size()]),parent);
     }
 
+    /**
+     * Gets Java module name option.
+     * @return Java module name option or {@code null} if this option was not set.
+     */
+    public String getModuleName() {
+        return javaModule;
+    }
 
     /**
-     * Parses an option <code>args[i]</code> and return
+     * Parses an option {@code args[i]} and return
      * the number of tokens consumed.
      *
      * @return
@@ -522,6 +533,10 @@ public class Options
                 // automatically as a usability feature
                 packageLevelAnnotations = false;
             }
+            return 2;
+        }
+        if (args[i].equals("-m")) {
+            javaModule = requireArgument("-m", args, ++i);
             return 2;
         }
         if (args[i].equals("-debug")) {
@@ -575,14 +590,6 @@ public class Options
         }
         if (args[i].equals("-dtd")) {
             schemaLanguage = Language.DTD;
-            return 1;
-        }
-        if (args[i].equals("-relaxng")) {
-            schemaLanguage = Language.RELAXNG;
-            return 1;
-        }
-        if (args[i].equals("-relaxng-compact")) {
-            schemaLanguage = Language.RELAXNG_COMPACT;
             return 1;
         }
         if (args[i].equals("-xmlschema")) {
@@ -647,7 +654,7 @@ public class Options
         if( args[i].equals("-catalog") ) {
             // use Sun's "XML Entity and URI Resolvers" by Norman Walsh
             // to resolve external entities.
-            // http://www.sun.com/xml/developers/resolver/
+            // https://xerces.apache.org/xml-commons/components/resolver/resolver-article.html
 
             File catalogFile = new File(requireArgument("-catalog",args,++i));
             try {
@@ -758,7 +765,7 @@ public class Options
      * and add them as {@link InputSource} to the specified list.
      *
      * @param suffix
-     *      If the given token is a directory name, we do a recusive search
+     *      If the given token is a directory name, we do a recursive search
      *      and find all files that have the given suffix.
      */
     private void addFile(String name, List<InputSource> target, String suffix) throws BadCommandLineException {
@@ -783,6 +790,7 @@ public class Options
 
     /**
      * Adds a new catalog file.
+     * Use created or existed resolver to parse new catalog file.
      */
     public void addCatalog(File catalogFile) throws IOException {
         if(entityResolver==null) {
@@ -857,7 +865,7 @@ public class Options
     }
 
     /**
-     * Finds the <tt>META-INF/sun-jaxb.episode</tt> file to add as a binding customization.
+     * Finds the {@code META-INF/sun-jaxb.episode} file to add as a binding customization.
      */
     public void scanEpisodeFile(File jar) throws BadCommandLineException {
         try {
@@ -884,10 +892,6 @@ public class Options
         if ((grammars != null) && (grammars.size() > 0)) {
             String name = grammars.get(0).getSystemId().toLowerCase();
 
-            if (name.endsWith(".rng"))
-                return Language.RELAXNG;
-            if (name.endsWith(".rnc"))
-                return Language.RELAXNG_COMPACT;
             if (name.endsWith(".dtd"))
                 return Language.DTD;
             if (name.endsWith(".wsdl"))
@@ -991,5 +995,5 @@ public class Options
         }
         return systemId;
     }
-    
+
 }

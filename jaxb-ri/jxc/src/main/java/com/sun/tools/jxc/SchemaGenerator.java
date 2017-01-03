@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 1997-2015 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2016 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -45,6 +45,7 @@ import com.sun.tools.xjc.BadCommandLineException;
 import com.sun.xml.bind.util.Which;
 
 import javax.lang.model.SourceVersion;
+import javax.tools.Diagnostic;
 import javax.tools.DiagnosticCollector;
 import javax.tools.JavaCompiler;
 import javax.tools.JavaFileObject;
@@ -60,7 +61,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
@@ -197,8 +197,8 @@ public class SchemaGenerator {
     }
 
     /**
-     * Computes the file system path of <tt>jaxb-api.jar</tt> so that
-     * Annotation Processing will see them in the <tt>-cp</tt> option.
+     * Computes the file system path of {@code jaxb-api.jar} so that
+     * Annotation Processing will see them in the {@code -cp} option.
      *
      * <p>
      * In Java, you can't do this reliably (for that matter there's no guarantee
@@ -263,7 +263,12 @@ public class SchemaGenerator {
             if (episode != null)
                 r.setEpisodeFile(episode);
             task.setProcessors(Collections.singleton(r));
-            return task.call();
+            boolean res = task.call();
+            //Print compiler generated messages
+            for( Diagnostic<? extends JavaFileObject> d : diagnostics.getDiagnostics() ) {
+                 System.err.println(d.toString());
+            }
+            return res;
         }
     }
 

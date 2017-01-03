@@ -53,7 +53,6 @@ import com.sun.xml.bind.marshaller.CharacterEscapeHandler;
 /**
  * {@link XmlOutput} that generates canonical XML.
  *
- * See com.sun.xml.bind.api.C14nSupport_ArchitectureDocument which is part of jaxb-architecture-document project.
  * @author Kohsuke Kawaguchi
  */
 public class C14nXmlOutput extends UTF8XmlOutput {
@@ -83,9 +82,6 @@ public class C14nXmlOutput extends UTF8XmlOutput {
      * (AKA attribute wildcard.)
      *
      * As long as this map is empty, there's no need for sorting.
-     * see com.sun.xml.bind.api.C14nSupport_ArchitectureDocument [1] for more details.
-     *
-     * [1] com.sun.xml.bind.api.C14nSupport_ArchitectureDocument is part of jaxb-architecture-document project.
      */
     private final FinalArrayList<DynamicAttribute> otherAttributes = new FinalArrayList<DynamicAttribute>();
 

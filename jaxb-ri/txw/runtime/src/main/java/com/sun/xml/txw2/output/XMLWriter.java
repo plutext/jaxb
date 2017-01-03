@@ -57,7 +57,6 @@ import org.xml.sax.helpers.XMLFilterImpl;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -259,8 +258,8 @@ import java.util.Map;
  * though it's not needed there, and can be inherited by its
  * descendants:</p>
  *
- * <pre>
- * {@code <xml version="1.0" standalone="yes"?>
+ * <pre>{@code
+ * <xml version="1.0" standalone="yes"?>
  *
  * <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
  *             xmlns:dc="http://www.purl.org/dc/">
@@ -269,8 +268,8 @@ import java.util.Map;
  *   <dc:creator>Jane Smith</dc:title>
  *   <dc:date>2000-09-09</dc:title>
  *  </rdf:Description>
- * </rdf:RDF>}
- * </pre>
+ * </rdf:RDF>
+ * }</pre>
  *
  * <p>This approach is also useful for declaring Namespace prefixes
  * that be used by qualified names appearing in attribute values or 
@@ -391,7 +390,7 @@ public class XMLWriter extends XMLFilterImpl implements LexicalHandler
     public void setOutput (Writer writer,String _encoding)
     {
         if (writer == null) {
-            output = new OutputStreamWriter(System.out, StandardCharsets.UTF_8);
+            output = new OutputStreamWriter(System.out);
         } else {
             output = writer;
         }

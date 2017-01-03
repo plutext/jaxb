@@ -3,7 +3,7 @@
 
 DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 
-Copyright (c) 2013-2015 Oracle and/or its affiliates. All rights reserved.
+Copyright (c) 2013-2016 Oracle and/or its affiliates. All rights reserved.
 
 The contents of this file are subject to the terms of either the GNU
 General Public License Version 2 only ("GPL") or the Common Development
@@ -149,6 +149,7 @@ holder.
         <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
         <!-- This will work ONLY if mvn is run from root folder. In case of runing from submodules - fail :( -->
         <javadoc.links.dir>${user.dir}/tools/javadoc-link</javadoc.links.dir>
+        <glassfish.findbugs.version>1.7</glassfish.findbugs.version>
         <findbugs.skip>false</findbugs.skip>
         <findbugs.threshold>High</findbugs.threshold>
         <findbugs.exclude/>
@@ -157,8 +158,7 @@ holder.
         <skipOsgiTests>true</skipOsgiTests>
         <netbeans.hint.jdkPlatform>JDK_1.6</netbeans.hint.jdkPlatform>
         <felix.junit4osgi>1.0.0</felix.junit4osgi>
-        <felix.osgi.core>1.2.0</felix.osgi.core>
-        <felix.junit4osgi>1.0.0</felix.junit4osgi>
+        <felix.osgi.core>1.4.0</felix.osgi.core>
         <surefire.plugin>2.13</surefire.plugin>
         <jmockit.version>1.14</jmockit.version>
     </properties>
@@ -195,14 +195,6 @@ holder.
                 <version>1.0.8</version>
                 <scope>test</scope>
             </dependency>
-            <!-- JDK dependencies -->
-            <dependency>
-                <groupId>com.sun</groupId>
-                <artifactId>tools</artifactId>
-                <version>1.6</version>
-                <scope>system</scope>
-                <systemPath>${tools.jar}</systemPath>
-            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -211,7 +203,7 @@ holder.
             <plugins>
                 <plugin>
                     <artifactId>maven-shade-plugin</artifactId>
-                    <version>2.0</version>
+                    <version>2.4.3</version>
                     <configuration>
                         <createDependencyReducedPom>false</createDependencyReducedPom>
                     </configuration>
@@ -230,7 +222,7 @@ holder.
                 <plugin>
                     <groupId>org.apache.felix</groupId>
                     <artifactId>maven-bundle-plugin</artifactId>
-                    <version>2.4.0</version>
+                    <version>3.2.0</version>
                     <extensions>true</extensions>
                 </plugin>
                 <plugin>
@@ -278,7 +270,7 @@ holder.
                 </plugin>
                 <plugin>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>2.5.1</version>
+                    <version>3.5.1</version>
                     <configuration>
                         <source>1.8</source>
                         <target>1.8</target>
@@ -333,7 +325,7 @@ holder.
                 </plugin>
                 <plugin>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>2.9</version>
+                    <version>2.10.4</version>
                     <configuration>
                         <aggregate>false</aggregate>
                         <dependencySourceExcludes>
@@ -350,6 +342,8 @@ holder.
                                 <location>${javadoc.links.dir}/jaxb-api/</location>
                             </offlineLink>
                         </offlineLinks>
+                        <!-- TODO: solve jdb8 javadoc errors -->
+                        <failOnError>false</failOnError>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -421,7 +415,7 @@ holder.
                         <dependency>
                             <groupId>org.glassfish.findbugs</groupId>
                             <artifactId>findbugs</artifactId>
-                            <version>1.2</version>
+                            <version>${glassfish.findbugs.version}</version>
                         </dependency>
                     </dependencies>
                 </plugin>
@@ -687,50 +681,6 @@ holder.
                     </plugin>
                 </plugins>
             </build>
-        </profile>
-        <profile>
-            <id>default-tools.jar</id>
-            <activation>
-                <file>
-                    <exists>${java.home}/../lib/tools.jar</exists>
-                </file>
-            </activation>
-            <properties>
-                <tools.jar>${java.home}/../lib/tools.jar</tools.jar>
-            </properties>
-        </profile>
-        <profile>
-            <id>default-tools.jar-mac</id>
-            <activation>
-                <file>
-                    <exists>${java.home}/../Classes/classes.jar</exists>
-                </file>
-            </activation>
-            <properties>
-                <tools.jar>${java.home}/../Classes/classes.jar</tools.jar>
-            </properties>
-        </profile>
-        <profile>
-            <id>default-rt.jar</id>
-            <activation>
-                <file>
-                    <exists>${java.home}/../jre/lib/rt.jar</exists>
-                </file>
-            </activation>
-            <properties>
-                <rt.jar>${java.home}/../jre/lib/rt.jar</rt.jar>
-            </properties>
-        </profile>
-        <profile>       <!--todo: remove me-->
-            <id>default-rt.jar-mac</id>
-            <activation>
-                <file>
-                    <exists>${java.home}/../Classes/classes.jar</exists>
-                </file>
-            </activation>
-            <properties>
-                <rt.jar>${java.home}/../Classes/classes.jar</rt.jar>
-            </properties>
         </profile>
         <profile>
             <id>dev-impl</id>

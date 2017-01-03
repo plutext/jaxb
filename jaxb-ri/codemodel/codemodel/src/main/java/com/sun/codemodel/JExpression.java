@@ -54,7 +54,7 @@ package com.sun.codemodel;
  * which returns a complicated expression (by often taking other {@link JExpression}s
  * as parameters.
  * For example, you can build "5+2" by
- * <tt>JExpr.lit(5).add(JExpr.lit(2))</tt>
+ * {@code JExpr.lit(5).add(JExpr.lit(2))}
  */
 public interface JExpression extends JGenerable {
     /**
@@ -112,12 +112,12 @@ public interface JExpression extends JGenerable {
     JExpression shl(JExpression right);
 
     /**
-     * Returns "{@code[this]>>[right]}"
+     * Returns "{@code [this]>>[right]}"
      */
     JExpression shr(JExpression right);
 
     /**
-     * Returns "{@code[this]>>>[right]}"
+     * Returns "{@code [this]>>>[right]}"
      */
     JExpression shrz(JExpression right);
 
